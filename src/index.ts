@@ -10,4 +10,7 @@ if (node === null) {
 
 Elm.Elm.Main.init({
     node,
+    flags: {
+        token: localStorage.getItem('de.metafnord.wueww-admin.token'),
+    },
 });

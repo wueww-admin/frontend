@@ -1,4 +1,6 @@
-export interface Flags {}
+export interface Flags {
+    token: string | null;
+}
 
 export interface Ports {}
 

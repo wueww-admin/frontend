@@ -8,12 +8,23 @@ import Html.Events exposing (onClick)
 
 
 type alias Model =
-    Int
+    { value : Int
+    , token : Maybe String
+    }
 
 
-main : Platform.Program () Model Msg
+type alias Flags =
+    { token : Maybe String }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( { value = 0, token = flags.token }, Cmd.none )
+
+
+main : Platform.Program Flags Model Msg
 main =
-    Browser.sandbox { init = 0, update = update, view = view }
+    Browser.element { init = init, subscriptions = subscriptions, update = update, view = view }
 
 
 type Msg
@@ -21,20 +32,25 @@ type Msg
     | Decrement
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            model + 1
+            ( { model | value = model.value + 1 }, Cmd.none )
 
         Decrement ->
-            model - 1
+            ( { model | value = model.value - 1 }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
     Grid.container []
         [ Button.button [ Button.onClick Decrement ] [ text "-" ]
-        , div [] [ text (String.fromInt model) ]
+        , div [] [ text (String.fromInt model.value) ]
         , Button.button [ Button.onClick Increment ] [ text "+" ]
         ]
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
