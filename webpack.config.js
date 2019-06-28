@@ -1,3 +1,4 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = (env, argv) => ({
@@ -32,6 +33,7 @@ module.exports = (env, argv) => ({
             title: 'WueWW Admin',
             template: './public/index.html',
         }),
+        new CopyWebpackPlugin([{ from: 'public/assets', to: 'assets' }]),
     ],
     devServer: {
         proxy: {
