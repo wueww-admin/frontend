@@ -35,8 +35,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Grid.container []
-        [ CDN.stylesheet
-        , Button.button [ Button.onClick Decrement ] [ text "-" ]
+        [ Button.button [ Button.onClick Decrement ] [ text "-" ]
         , div [] [ text (String.fromInt model) ]
         , Button.button [ Button.onClick Increment ] [ text "+" ]
         ]

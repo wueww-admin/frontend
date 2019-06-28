@@ -1,4 +1,4 @@
-console.log('hello world');
+require('bootstrap/scss/bootstrap.scss');
 
 const { Elm } = require('./Main');
 
