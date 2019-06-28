@@ -1,6 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
+module.exports = (env, argv) => ({
     entry: './src/index',
     output: {
         filename: './app.js',
@@ -20,7 +20,9 @@ module.exports = {
                 exclude: [/elm-stuff/, /node_modules/],
                 use: {
                     loader: 'elm-webpack-loader',
-                    options: {},
+                    options: {
+                        optimize: argv.mode === 'production',
+                    },
                 },
             },
         ],
@@ -41,4 +43,4 @@ module.exports = {
             },
         },
     },
-};
+});
