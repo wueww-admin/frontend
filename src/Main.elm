@@ -1,7 +1,6 @@
 module Main exposing (main)
 
 import Bootstrap.Button as Button
-import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 import Browser
 import Html exposing (Html, button, div, text)

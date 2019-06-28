@@ -1,15 +1,16 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: './src/index',
     output: {
         filename: './app.js',
     },
     resolve: {
-        extensions: ['.js', '.elm'],
+        extensions: ['.elm', '.ts', '.js'],
     },
     module: {
         rules: [
+            { test: /\.tsx?/, loader: 'ts-loader' },
             {
                 test: /\.scss$/,
                 use: ['style-loader', 'css-loader', 'sass-loader'],
