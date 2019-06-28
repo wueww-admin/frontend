@@ -31,4 +31,14 @@ module.exports = {
             template: './public/index.html',
         }),
     ],
+    devServer: {
+        proxy: {
+            '/api': {
+                target: 'http://wueww-admin.metafnord.de/',
+                headers: {
+                    Host: 'wueww-admin.metafnord.de',
+                },
+            },
+        },
+    },
 };
