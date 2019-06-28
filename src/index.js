@@ -1,7 +1,7 @@
-console.log('hello world')
+console.log('hello world');
 
-const {Elm} = require('./Main');
+const { Elm } = require('./Main');
 
 Elm.Main.init({
-    node: document.getElementById("root")
+    node: document.getElementById('root'),
 });

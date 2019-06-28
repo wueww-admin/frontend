@@ -1,0 +1,15 @@
+{
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "typescript.tsdk": "./node_modules/typescript/lib",
+
+    "importSorter.generalConfiguration.sortOnBeforeSave": true,
+    "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 120,
+    "importSorter.importStringConfiguration.tabSize": 4,
+    "importSorter.importStringConfiguration.quoteMark": "single",
+    "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.type": "newLineEachExpressionAfterCountLimit",
+
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}
