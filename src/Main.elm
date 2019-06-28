@@ -1,17 +1,16 @@
 module Main exposing (main)
 
-import Bootstrap.Button as Button
-import Bootstrap.Form as Form
-import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Browser
-import Html exposing (Html, button, text)
-import Html.Attributes exposing (for, style)
+import Html exposing (Html, text)
+import Html.Attributes exposing (style)
+import Page.Login as Login
 import Ports
 
 
 type alias Model =
     { token : Maybe String
+    , login : Login.Model
     }
 
 
@@ -21,7 +20,11 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { token = flags.token }, Cmd.none )
+    ( { token = flags.token
+      , login = Login.init
+      }
+    , Cmd.none
+    )
 
 
 main : Platform.Program Flags Model Msg
@@ -31,6 +34,7 @@ main =
 
 type Msg
     = SetToken String
+    | GotLoginMsg Login.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -38,6 +42,12 @@ update msg model =
     case msg of
         SetToken newToken ->
             ( { model | token = Just newToken }, Ports.token newToken )
+
+        GotLoginMsg Login.LoginNow ->
+            ( Debug.log "foo" model, Cmd.none )
+
+        GotLoginMsg loginMsg ->
+            ( { model | login = Login.update loginMsg model.login }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -47,7 +57,7 @@ view model =
             text "you're logged in" |> narrowContainer
 
         Nothing ->
-            loginForm |> narrowContainer
+            Login.loginForm model.login |> Html.map GotLoginMsg |> narrowContainer
 
 
 subscriptions : Model -> Sub Msg
@@ -64,18 +74,3 @@ narrowContainer content =
         , style "padding" "2rem"
         ]
         [ content ]
-
-
-loginForm : Html Msg
-loginForm =
-    Form.form []
-        [ Form.group []
-            [ Form.label [ for "login" ] [ text "Login" ]
-            , Input.text [ Input.id "login" ]
-            ]
-        , Form.group []
-            [ Form.label [ for "password" ] [ text "Passwort" ]
-            , Input.password [ Input.id "password" ]
-            ]
-        , Button.button [ Button.primary ] [ text "Anmelden" ]
-        ]
