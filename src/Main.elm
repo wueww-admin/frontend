@@ -5,6 +5,7 @@ import Bootstrap.Grid as Grid
 import Browser
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Ports
 
 
 type alias Model =
@@ -30,6 +31,7 @@ main =
 type Msg
     = Increment
     | Decrement
+    | SetToken String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -40,6 +42,9 @@ update msg model =
 
         Decrement ->
             ( { model | value = model.value - 1 }, Cmd.none )
+
+        SetToken newToken ->
+            ( { model | token = Just newToken }, Ports.token newToken )
 
 
 view : Model -> Html Msg
@@ -52,5 +57,5 @@ view model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
