@@ -4,9 +4,10 @@ import Base64
 import Bootstrap.Alert as Alert
 import Bootstrap.Grid as Grid
 import Bootstrap.Modal as Modal
+import Bootstrap.Navbar as Navbar
 import Browser
-import Html exposing (Html, text)
-import Html.Attributes exposing (style)
+import Html exposing (Html, a, li, text, ul)
+import Html.Attributes exposing (href, style)
 import Http
 import Json.Decode
 import Json.Encode
@@ -16,6 +17,7 @@ import Ports
 
 type alias Model =
     { token : Maybe String
+    , navbarState : Navbar.State
     , blocked : Bool
     , error : Maybe String
     , login : Login.Model
@@ -28,12 +30,17 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
+    let
+        ( navbarState, navbarCmd ) =
+            Navbar.initialState NavbarMsg
+    in
     ( { token = flags.token
+      , navbarState = navbarState
       , blocked = False
       , error = Nothing
       , login = Login.init
       }
-    , Cmd.none
+    , navbarCmd
     )
 
 
@@ -47,6 +54,7 @@ type Msg
     | SetError String
     | SetToken String
     | GotLoginMsg Login.Msg
+    | NavbarMsg Navbar.State
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -66,6 +74,9 @@ update msg model =
 
         GotLoginMsg loginMsg ->
             ( { model | login = Login.update loginMsg model.login }, Cmd.none )
+
+        NavbarMsg state ->
+            ( { model | navbarState = state }, Cmd.none )
 
 
 blockUI : Model -> Model
@@ -87,16 +98,18 @@ view : Model -> Html Msg
 view model =
     case model.token of
         Just x ->
-            case decodeToken x |> Result.map (\{ role, email } -> ( role, email )) of
-                Ok ( User, email ) ->
-                    text <| "nice, you're a user w/ addy " ++ email
+            viewNavbar model.navbarState x
 
-                Ok ( Editor, _ ) ->
-                    text "woohoo, you're the editor!"
+        {- case decodeToken x |> Result.map (\{ role, email } -> ( role, email )) of
+           Ok ( User, email ) ->
+               text <| "nice, you're a user w/ addy " ++ email
 
-                Err _ ->
-                    text "arghl, invalid token"
+           Ok ( Editor, _ ) ->
+               text "woohoo, you're the editor!"
 
+           Err _ ->
+               text "arghl, invalid token"
+        -}
         Nothing ->
             Login.loginForm model.login |> Html.map GotLoginMsg |> narrowContainer model
 
@@ -104,6 +117,27 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
+
+
+viewNavbar : Navbar.State -> String -> Html Msg
+viewNavbar navbarState token =
+    Navbar.config NavbarMsg
+        |> Navbar.withAnimation
+        |> Navbar.dark
+        |> Navbar.brand [ href "#" ] [ text "WueWW Admin" ]
+        |> Navbar.items
+            [ Navbar.itemLink [ href "#" ] [ text "Sessions" ]
+            , Navbar.itemLink [ href "#" ] [ text "Organisation" ]
+            ]
+        |> Navbar.customItems
+            [ ul [ Html.Attributes.class "navbar-nav" ]
+                [ li [ Html.Attributes.class "nav-item" ]
+                    [ a [ href "#", Html.Attributes.class "nav-link" ] [ text "Logout" ]
+                    ]
+                ]
+                |> Navbar.customItem
+            ]
+        |> Navbar.view navbarState
 
 
 narrowContainer : Model -> Html Msg -> Html Msg
