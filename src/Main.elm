@@ -6,7 +6,7 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Modal as Modal
 import Bootstrap.Navbar as Navbar
 import Browser
-import Html exposing (Html, a, li, text, ul)
+import Html exposing (Html, a, i, li, span, text, ul)
 import Html.Attributes exposing (href, style)
 import Http
 import Json.Decode
@@ -130,9 +130,10 @@ viewNavbar navbarState token =
             , Navbar.itemLink [ href "#" ] [ text "Organisation" ]
             ]
         |> Navbar.customItems
-            [ ul [ Html.Attributes.class "navbar-nav" ]
+            [ Navbar.textItem [] [ text "foo@example.org" ]
+            , ul [ Html.Attributes.class "navbar-nav" ]
                 [ li [ Html.Attributes.class "nav-item" ]
-                    [ a [ href "#", Html.Attributes.class "nav-link" ] [ text "Logout" ]
+                    [ a [ href "#", Html.Attributes.class "nav-link" ] [ text "\u{00A0}", i [ Html.Attributes.class "fa", Html.Attributes.class "fa-sign-out" ] [] ]
                     ]
                 ]
                 |> Navbar.customItem
