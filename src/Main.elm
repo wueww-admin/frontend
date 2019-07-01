@@ -185,12 +185,7 @@ decodeToken : String -> Result String TokenInfo
 decodeToken token =
     case String.split "." token of
         _ :: payload :: _ ->
-            case Base64.decode payload of
-                Ok x ->
-                    parseToken x
-
-                _ ->
-                    Err "Invalid Base64 token payload"
+            Base64.decode payload |> Result.andThen parseToken
 
         _ ->
             Err "Invalid JWT token structure"
