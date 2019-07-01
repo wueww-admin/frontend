@@ -1,4 +1,4 @@
-import './bootstrap.scss';
+import 'bootstrap/scss/bootstrap.scss';
 
 import Elm from './Main.elm';
 
