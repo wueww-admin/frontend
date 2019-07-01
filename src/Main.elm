@@ -87,11 +87,11 @@ view : Model -> Html Msg
 view model =
     case model.token of
         Just x ->
-            case decodeToken x |> Result.map .role of
-                Ok User ->
-                    text "nice, you're a user :-)"
+            case decodeToken x |> Result.map (\{ role, email } -> ( role, email )) of
+                Ok ( User, email ) ->
+                    text <| "nice, you're a user w/ addy " ++ email
 
-                Ok Editor ->
+                Ok ( Editor, _ ) ->
                     text "woohoo, you're the editor!"
 
                 Err _ ->
@@ -173,6 +173,7 @@ handleHttpResult lift result =
 
 type alias TokenInfo =
     { role : Role
+    , email : String
     }
 
 
@@ -193,22 +194,23 @@ decodeToken token =
 
 parseToken : String -> Result String TokenInfo
 parseToken decodedToken =
-    case Json.Decode.decodeString (Json.Decode.field "role" Json.Decode.string) decodedToken of
-        Ok roleStr ->
-            decodeRole roleStr |> Result.map TokenInfo
+    decodedToken
+        |> Json.Decode.decodeString
+            (Json.Decode.map2 TokenInfo
+                (Json.Decode.field "role" Json.Decode.string |> Json.Decode.andThen decodeRole)
+                (Json.Decode.field "email" Json.Decode.string)
+            )
+        |> Result.mapError Json.Decode.errorToString
 
-        _ ->
-            Err "Invalid JSON token payload"
 
-
-decodeRole : String -> Result String Role
+decodeRole : String -> Json.Decode.Decoder Role
 decodeRole roleStr =
     case roleStr of
         "user" ->
-            Ok User
+            Json.Decode.succeed User
 
         "editor" ->
-            Ok Editor
+            Json.Decode.succeed Editor
 
         _ ->
-            Err "Unexpected role"
+            Json.Decode.fail "Unexpected role"
