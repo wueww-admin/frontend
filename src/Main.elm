@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Base64
 import Bootstrap.Alert as Alert
 import Bootstrap.Grid as Grid
 import Bootstrap.Modal as Modal
@@ -7,6 +8,7 @@ import Browser
 import Html exposing (Html, text)
 import Html.Attributes exposing (style)
 import Http
+import Json.Decode
 import Json.Encode
 import Page.Login as Login
 import Ports
@@ -84,8 +86,16 @@ clearError model =
 view : Model -> Html Msg
 view model =
     case model.token of
-        Just _ ->
-            text "you're logged in" |> narrowContainer model
+        Just x ->
+            case decodeToken x |> Result.map .role of
+                Ok User ->
+                    text "nice, you're a user :-)"
+
+                Ok Editor ->
+                    text "woohoo, you're the editor!"
+
+                Err _ ->
+                    text "arghl, invalid token"
 
         Nothing ->
             Login.loginForm model.login |> Html.map GotLoginMsg |> narrowContainer model
@@ -153,3 +163,57 @@ handleHttpResult lift result =
 
         Err _ ->
             SetError "Unerwarteter Fehler"
+
+
+
+--
+-- Token Parser
+--
+
+
+type alias TokenInfo =
+    { role : Role
+    }
+
+
+type Role
+    = User
+    | Editor
+
+
+decodeToken : String -> Result String TokenInfo
+decodeToken token =
+    case String.split "." token of
+        _ :: payload :: _ ->
+            case Base64.decode payload of
+                Ok x ->
+                    parseToken x
+
+                _ ->
+                    Err "Invalid Base64 token payload"
+
+        _ ->
+            Err "Invalid JWT token structure"
+
+
+parseToken : String -> Result String TokenInfo
+parseToken decodedToken =
+    case Json.Decode.decodeString (Json.Decode.field "role" Json.Decode.string) decodedToken of
+        Ok roleStr ->
+            decodeRole roleStr |> Result.map TokenInfo
+
+        _ ->
+            Err "Invalid JSON token payload"
+
+
+decodeRole : String -> Result String Role
+decodeRole roleStr =
+    case roleStr of
+        "user" ->
+            Ok User
+
+        "editor" ->
+            Ok Editor
+
+        _ ->
+            Err "Unexpected role"
